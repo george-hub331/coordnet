@@ -1,24 +1,26 @@
-import "reactflow/dist/style.css";
+import "@xyflow/react/dist/style.css";
 import "./react-flow.css";
 
-import clsx from "clsx";
-import { DragEvent, useCallback, useEffect, useRef } from "react";
-import ReactFlow, {
+import {
   Background,
-  NodeDragHandler,
   OnConnect,
   OnEdgesDelete,
+  OnNodeDrag,
   OnNodesDelete,
+  ReactFlow,
   SelectionDragHandler,
   useReactFlow,
   XYPosition,
-} from "reactflow";
+} from "@xyflow/react";
+import clsx from "clsx";
+import { DragEvent, useCallback, useEffect, useRef } from "react";
 
 import { useCanvas, useFocus, useNodesContext, useQuickView, useYDoc } from "@/hooks";
 import { YDocScope } from "@/types";
 
 import SkillCanvasControls from "../Skills/SkillCanvasControls";
 import CanvasNodeComponent from "./CanvasNode";
+import ConnectionLine from "./ConnectionLine";
 import Controls from "./Controls";
 import { getLayoutedNodes } from "./getLayoutedNodes";
 import MultiNodeToolbar from "./MultiNodeToolbar";
@@ -80,7 +82,7 @@ const Canvas = ({ className }: { className?: string }) => {
     handleCanvasDrop(event.dataTransfer, takeSnapshot, parent, nodesMap, spaceMap, position);
   };
 
-  const onNodeDragStart: NodeDragHandler = useCallback(() => {
+  const onNodeDragStart: OnNodeDrag = useCallback(() => {
     takeSnapshot();
   }, [takeSnapshot]);
 
@@ -101,7 +103,7 @@ const Canvas = ({ className }: { className?: string }) => {
       takeSnapshot();
       const selectedNodes = nodes.filter((node) => node.selected);
 
-      if (selectedNodes.length > 0) {
+      if (selectedNodes.length > 1) {
         selectedNodes.forEach((node) => {
           onConnect({ ...params, source: node.id });
         });
@@ -162,6 +164,7 @@ const Canvas = ({ className }: { className?: string }) => {
           onConnect={onConnectWithUndo}
           onDrop={onDrop}
           onDragOver={onDragOver}
+          connectionLineComponent={ConnectionLine}
           nodeTypes={nodeTypes}
           onNodeDragStart={onNodeDragStart}
           onSelectionDragStart={onSelectionDragStart}
